@@ -1,14 +1,17 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 
 // Datos de resultados predefinidos
 const evaluationTitles = {
   '1': 'Evaluación de Seguridad',
   '2': 'Evaluación de Procedimientos',
   '3': 'Evaluación de Inducción'
+};
+
+// Puntajes simulados para demo
+const demoScores = {
+  '1': 85,
+  '2': 72,
+  '3': 95
 };
 
 // Esta función es necesaria para generar páginas estáticas con parámetros dinámicos
@@ -20,37 +23,32 @@ export function generateStaticParams() {
   ];
 }
 
+function getFeedback(score: number): string {
+  if (score >= 90) {
+    return 'Excelente rendimiento. Dominas los conocimientos evaluados.';
+  } else if (score >= 70) {
+    return 'Buen rendimiento. Tienes una comprensión sólida de los temas.';
+  } else if (score >= 50) {
+    return 'Rendimiento satisfactorio. Hay áreas que puedes mejorar.';
+  } else {
+    return 'Necesitas reforzar tus conocimientos en este tema. Te recomendamos revisar los materiales de capacitación.';
+  }
+}
+
+function getScoreColor(score: number): string {
+  if (score >= 90) return 'bg-green-100 text-green-800';
+  if (score >= 70) return 'bg-blue-100 text-blue-800';
+  if (score >= 50) return 'bg-yellow-100 text-yellow-800';
+  return 'bg-red-100 text-red-800';
+}
+
 export default function EvaluationResultPage({ params }: { params: { id: string } }) {
-  const searchParams = useSearchParams();
-  const score = searchParams.get('score') ? parseInt(searchParams.get('score')!) : 85;
+  const id = params.id;
+  const title = evaluationTitles[id as keyof typeof evaluationTitles] || 'Evaluación';
+  const score = demoScores[id as keyof typeof demoScores] || 75;
+  const feedback = getFeedback(score);
+  const date = '01/04/2025'; // Fecha fija para demo estática
   
-  const [result, setResult] = useState({
-    id: params.id,
-    title: evaluationTitles[params.id as keyof typeof evaluationTitles] || 'Evaluación',
-    date: new Date().toLocaleDateString(),
-    score: score,
-    feedback: getFeedback(score)
-  });
-
-  function getFeedback(score: number): string {
-    if (score >= 90) {
-      return 'Excelente rendimiento. Dominas los conocimientos evaluados.';
-    } else if (score >= 70) {
-      return 'Buen rendimiento. Tienes una comprensión sólida de los temas.';
-    } else if (score >= 50) {
-      return 'Rendimiento satisfactorio. Hay áreas que puedes mejorar.';
-    } else {
-      return 'Necesitas reforzar tus conocimientos en este tema. Te recomendamos revisar los materiales de capacitación.';
-    }
-  }
-
-  function getScoreColor(score: number): string {
-    if (score >= 90) return 'bg-green-100 text-green-800';
-    if (score >= 70) return 'bg-blue-100 text-blue-800';
-    if (score >= 50) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-red-100 text-red-800';
-  }
-
   return (
     <div className="min-h-screen bg-gray-100">
       <header className="bg-primary text-white py-4">
@@ -66,12 +64,12 @@ export default function EvaluationResultPage({ params }: { params: { id: string 
 
       <main className="container mx-auto px-4 py-8">
         <div className="card max-w-2xl mx-auto">
-          <h2 className="text-2xl font-bold mb-6">{result.title}</h2>
+          <h2 className="text-2xl font-bold mb-6">{title}</h2>
           
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-            <p className="text-gray-600">Completado: {result.date}</p>
-            <div className={`${getScoreColor(result.score)} px-4 py-2 rounded-full font-medium text-lg`}>
-              Puntaje: {result.score}%
+            <p className="text-gray-600">Completado: {date}</p>
+            <div className={`${getScoreColor(score)} px-4 py-2 rounded-full font-medium text-lg`}>
+              Puntaje: {score}%
             </div>
           </div>
           
@@ -80,18 +78,18 @@ export default function EvaluationResultPage({ params }: { params: { id: string 
             <div className="w-full bg-gray-200 rounded-full h-4 mb-4">
               <div 
                 className={`h-4 rounded-full ${
-                  result.score >= 90 ? 'bg-green-500' :
-                  result.score >= 70 ? 'bg-blue-500' :
-                  result.score >= 50 ? 'bg-yellow-500' :
+                  score >= 90 ? 'bg-green-500' :
+                  score >= 70 ? 'bg-blue-500' :
+                  score >= 50 ? 'bg-yellow-500' :
                   'bg-red-500'
                 }`}
-                style={{ width: `${result.score}%` }}
+                style={{ width: `${score}%` }}
               ></div>
             </div>
             
             <div className="p-4 bg-gray-50 border rounded mb-6">
               <h4 className="font-medium mb-2">Feedback:</h4>
-              <p>{result.feedback}</p>
+              <p>{feedback}</p>
             </div>
           </div>
           
@@ -99,8 +97,8 @@ export default function EvaluationResultPage({ params }: { params: { id: string 
             <Link href="/dashboard" className="btn-secondary text-center">
               Ver todas las evaluaciones
             </Link>
-            {result.score < 70 && (
-              <Link href={`/evaluations/${result.id}`} className="btn-primary text-center">
+            {score < 70 && (
+              <Link href={`/evaluations/${id}`} className="btn-primary text-center">
                 Volver a intentar
               </Link>
             )}

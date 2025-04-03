@@ -1,7 +1,3 @@
-'use client';
-
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 // Datos de evaluaciones predefinidos
@@ -88,56 +84,7 @@ export function generateStaticParams() {
 }
 
 export default function EvaluationPage({ params }: { params: { id: string } }) {
-  const router = useRouter();
   const evaluation = evaluationsData[params.id as keyof typeof evaluationsData];
-  const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [submitting, setSubmitting] = useState(false);
-
-  const handleAnswerSelect = (questionId: string, optionIndex: number) => {
-    setAnswers(prev => ({
-      ...prev,
-      [questionId]: optionIndex
-    }));
-  };
-
-  const handlePrevQuestion = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(prev => prev - 1);
-    }
-  };
-
-  const handleNextQuestion = () => {
-    if (evaluation && currentQuestion < evaluation.questions.length - 1) {
-      setCurrentQuestion(prev => prev + 1);
-    }
-  };
-
-  const calculateScore = () => {
-    if (!evaluation) return 0;
-    
-    let correctAnswers = 0;
-    evaluation.questions.forEach(question => {
-      if (answers[question.id] === question.correctOption) {
-        correctAnswers++;
-      }
-    });
-    
-    return Math.round((correctAnswers / evaluation.questions.length) * 100);
-  };
-
-  const handleSubmit = () => {
-    setSubmitting(true);
-    
-    // Simulación de envío
-    setTimeout(() => {
-      const score = calculateScore();
-      router.push(`/evaluations/result/${params.id}?score=${score}`);
-    }, 800);
-  };
-
-  // Verificar si todas las preguntas están respondidas
-  const allQuestionsAnswered = evaluation?.questions.every(q => answers[q.id] !== undefined);
 
   if (!evaluation) {
     return (
@@ -152,8 +99,7 @@ export default function EvaluationPage({ params }: { params: { id: string } }) {
     );
   }
 
-  const currentQ = evaluation.questions[currentQuestion];
-
+  // Para exportación estática, mostramos el contenido de la evaluación sin interactividad
   return (
     <div className="min-h-screen bg-gray-100">
       <header className="bg-primary text-white py-4">
@@ -173,75 +119,33 @@ export default function EvaluationPage({ params }: { params: { id: string } }) {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold">{evaluation.title}</h2>
               <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                Pregunta {currentQuestion + 1} de {evaluation.questions.length}
+                {evaluation.questions.length} preguntas
               </span>
             </div>
             <p className="text-gray-600">{evaluation.description}</p>
-            <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
-              <div 
-                className="bg-primary h-2 rounded-full"
-                style={{ width: `${(Object.keys(answers).length / evaluation.questions.length) * 100}%` }}
-              ></div>
-            </div>
           </div>
 
           <div className="mb-8">
-            <h3 className="text-xl font-medium mb-4">{currentQ.question}</h3>
-            <div className="space-y-3">
-              {currentQ.options.map((option, index) => (
-                <div 
-                  key={index}
-                  className={`border p-4 rounded cursor-pointer hover:bg-gray-50 ${
-                    answers[currentQ.id] === index ? 'border-primary bg-blue-50' : ''
-                  }`}
-                  onClick={() => handleAnswerSelect(currentQ.id, index)}
-                >
-                  <label className="flex items-start cursor-pointer">
-                    <input 
-                      type="radio"
-                      name={`question-${currentQ.id}`}
-                      checked={answers[currentQ.id] === index}
-                      onChange={() => handleAnswerSelect(currentQ.id, index)}
-                      className="mt-1"
-                    />
-                    <span className="ml-2">{option}</span>
-                  </label>
+            <h3 className="text-xl font-medium mb-4">Contenido de la evaluación:</h3>
+            <div className="space-y-6">
+              {evaluation.questions.map((question, index) => (
+                <div key={question.id} className="border p-4 rounded bg-gray-50">
+                  <h4 className="font-medium mb-3">Pregunta {index + 1}: {question.question}</h4>
+                  <ul className="space-y-2 ml-5 list-disc">
+                    {question.options.map((option, optIndex) => (
+                      <li key={optIndex}>{option}</li>
+                    ))}
+                  </ul>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="flex justify-between">
-            <button
-              onClick={handlePrevQuestion}
-              disabled={currentQuestion === 0}
-              className={`px-4 py-2 rounded ${
-                currentQuestion === 0 
-                  ? 'bg-gray-300 cursor-not-allowed' 
-                  : 'bg-gray-200 hover:bg-gray-300'
-              }`}
-            >
-              Anterior
-            </button>
-            
-            {currentQuestion < evaluation.questions.length - 1 ? (
-              <button
-                onClick={handleNextQuestion}
-                className="btn-primary"
-              >
-                Siguiente
-              </button>
-            ) : (
-              <button
-                onClick={handleSubmit}
-                disabled={!allQuestionsAnswered || submitting}
-                className={`btn-primary ${
-                  !allQuestionsAnswered || submitting ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-              >
-                {submitting ? 'Enviando...' : 'Finalizar Evaluación'}
-              </button>
-            )}
+          <div className="text-center">
+            <p className="mb-4 italic">Para realizar esta evaluación, inicia sesión en la aplicación</p>
+            <Link href="/auth/login" className="btn-primary">
+              Iniciar Sesión
+            </Link>
           </div>
         </div>
       </main>
