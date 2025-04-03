@@ -11,6 +11,15 @@ const evaluationTitles = {
   '3': 'Evaluación de Inducción'
 };
 
+// Esta función es necesaria para generar páginas estáticas con parámetros dinámicos
+export function generateStaticParams() {
+  return [
+    { id: '1' },
+    { id: '2' },
+    { id: '3' }
+  ];
+}
+
 export default function EvaluationResultPage({ params }: { params: { id: string } }) {
   const searchParams = useSearchParams();
   const score = searchParams.get('score') ? parseInt(searchParams.get('score')!) : 85;

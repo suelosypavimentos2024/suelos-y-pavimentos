@@ -79,6 +79,14 @@ const evaluationsData = {
   }
 };
 
+// Esta función es necesaria para generar páginas estáticas con parámetros dinámicos
+export function generateStaticParams() {
+  return [
+    { id: '1' },
+    { id: '2' }
+  ];
+}
+
 export default function EvaluationPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const evaluation = evaluationsData[params.id as keyof typeof evaluationsData];
