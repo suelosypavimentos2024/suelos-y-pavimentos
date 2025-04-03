@@ -31,13 +31,12 @@ export default function Login() {
     }
 
     try {
-      // Aquí iría la lógica para autenticar al usuario con Firebase
-      // Por ahora, simulamos un inicio de sesión exitoso
+      // Simulación de inicio de sesión exitoso
       setTimeout(() => {
         router.push('/dashboard');
-      }, 1500);
+      }, 800);
     } catch (err: any) {
-      setError(err.message || 'Error al iniciar sesión');
+      setError('Error al iniciar sesión');
       setLoading(false);
     }
   };

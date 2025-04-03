@@ -23,14 +23,13 @@ export default function PasswordRecovery() {
     }
 
     try {
-      // Aquí iría la lógica para enviar el correo de recuperación con Firebase
-      // Por ahora, simulamos un envío exitoso
+      // Simulación de envío de correo de recuperación exitoso
       setTimeout(() => {
         setSuccess(true);
         setLoading(false);
-      }, 1500);
-    } catch (err: any) {
-      setError(err.message || 'Error al enviar el correo de recuperación');
+      }, 800);
+    } catch (err) {
+      setError('Error al enviar el correo de recuperación');
       setLoading(false);
     }
   };

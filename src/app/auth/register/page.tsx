@@ -39,13 +39,12 @@ export default function Register() {
     }
 
     try {
-      // Aquí iría la lógica para registrar al usuario con Firebase
-      // Por ahora, simulamos un registro exitoso
+      // Simulación de registro exitoso
       setTimeout(() => {
         router.push('/auth/login');
-      }, 1500);
-    } catch (err: any) {
-      setError(err.message || 'Error al registrar el usuario');
+      }, 800);
+    } catch (err) {
+      setError('Error al registrar el usuario');
       setLoading(false);
     }
   };

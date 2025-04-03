@@ -4,38 +4,26 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-interface EvaluationResult {
-  id: string;
-  title: string;
-  date: string;
-  score: number;
-  feedback: string;
-}
+// Datos de resultados predefinidos
+const evaluationTitles = {
+  '1': 'Evaluación de Seguridad',
+  '2': 'Evaluación de Procedimientos',
+  '3': 'Evaluación de Inducción'
+};
 
 export default function EvaluationResultPage({ params }: { params: { id: string } }) {
   const searchParams = useSearchParams();
-  const score = searchParams.get('score') ? parseInt(searchParams.get('score')!) : 0;
+  const score = searchParams.get('score') ? parseInt(searchParams.get('score')!) : 85;
   
-  const [result, setResult] = useState<EvaluationResult | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [result, setResult] = useState({
+    id: params.id,
+    title: evaluationTitles[params.id as keyof typeof evaluationTitles] || 'Evaluación',
+    date: new Date().toLocaleDateString(),
+    score: score,
+    feedback: getFeedback(score)
+  });
 
-  useEffect(() => {
-    // Aquí cargaríamos los resultados de la evaluación desde Firebase
-    // Por ahora, simulamos la carga de datos
-    setTimeout(() => {
-      const mockResult: EvaluationResult = {
-        id: params.id,
-        title: params.id === '1' ? 'Evaluación de Seguridad' : 'Evaluación de Procedimientos',
-        date: new Date().toLocaleDateString(),
-        score: score,
-        feedback: getFeedback(score)
-      };
-      setResult(mockResult);
-      setLoading(false);
-    }, 1000);
-  }, [params.id, score]);
-
-  const getFeedback = (score: number): string => {
+  function getFeedback(score: number): string {
     if (score >= 90) {
       return 'Excelente rendimiento. Dominas los conocimientos evaluados.';
     } else if (score >= 70) {
@@ -45,36 +33,13 @@ export default function EvaluationResultPage({ params }: { params: { id: string 
     } else {
       return 'Necesitas reforzar tus conocimientos en este tema. Te recomendamos revisar los materiales de capacitación.';
     }
-  };
+  }
 
-  const getScoreColor = (score: number): string => {
+  function getScoreColor(score: number): string {
     if (score >= 90) return 'bg-green-100 text-green-800';
     if (score >= 70) return 'bg-blue-100 text-blue-800';
     if (score >= 50) return 'bg-yellow-100 text-yellow-800';
     return 'bg-red-100 text-red-800';
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-xl">Cargando resultados...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!result) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-xl text-red-600">Los resultados no se encontraron</p>
-          <Link href="/dashboard" className="btn-primary mt-4 inline-block">
-            Volver al Dashboard
-          </Link>
-        </div>
-      </div>
-    );
   }
 
   return (

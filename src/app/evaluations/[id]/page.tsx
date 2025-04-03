@@ -1,81 +1,90 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-interface Question {
-  id: string;
-  question: string;
-  options: string[];
-  correctOption?: number;
-}
-
-interface Evaluation {
-  id: string;
-  title: string;
-  description: string;
-  dueDate: string;
-  questions: Question[];
-}
+// Datos de evaluaciones predefinidos
+const evaluationsData = {
+  '1': {
+    id: '1',
+    title: 'Evaluación de Seguridad',
+    description: 'Completa todas las preguntas para finalizar la evaluación.',
+    dueDate: '2025-04-20',
+    questions: [
+      {
+        id: 'q1',
+        question: '¿Cuál es el procedimiento correcto al encontrar un riesgo de seguridad?',
+        options: [
+          'Ignorarlo si no es grave',
+          'Reportarlo inmediatamente al supervisor',
+          'Solucionarlo por cuenta propia',
+          'Notificar al compañero más cercano'
+        ],
+        correctOption: 1
+      },
+      {
+        id: 'q2',
+        question: '¿Qué equipo de protección es obligatorio en todas las áreas?',
+        options: [
+          'Casco de seguridad',
+          'Guantes de protección',
+          'Protección ocular',
+          'Todos los anteriores'
+        ],
+        correctOption: 3
+      },
+      {
+        id: 'q3',
+        question: '¿Cuál es la frecuencia recomendada para las capacitaciones de seguridad?',
+        options: [
+          'Una vez al año',
+          'Cada seis meses',
+          'Cada tres meses',
+          'Mensualmente'
+        ],
+        correctOption: 2
+      }
+    ]
+  },
+  '2': {
+    id: '2',
+    title: 'Evaluación de Procedimientos',
+    description: 'Completa todas las preguntas para finalizar la evaluación.',
+    dueDate: '2025-04-20',
+    questions: [
+      {
+        id: 'q1',
+        question: '¿Cuál es el primer paso al iniciar el procedimiento estándar?',
+        options: [
+          'Verificar el equipo',
+          'Contactar al supervisor',
+          'Revisar el manual',
+          'Usar equipo de protección'
+        ],
+        correctOption: 3
+      },
+      {
+        id: 'q2',
+        question: '¿Qué documento debe completarse al finalizar un procedimiento?',
+        options: [
+          'Reporte de incidentes',
+          'Formulario de finalización',
+          'Bitácora de actividades',
+          'Ninguno de los anteriores'
+        ],
+        correctOption: 2
+      }
+    ]
+  }
+};
 
 export default function EvaluationPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
+  const evaluation = evaluationsData[params.id as keyof typeof evaluationsData];
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    // Aquí cargaríamos la evaluación desde Firebase
-    // Por ahora, simulamos la carga de datos
-    setTimeout(() => {
-      const mockEvaluation: Evaluation = {
-        id: params.id,
-        title: params.id === '1' ? 'Evaluación de Seguridad' : 'Evaluación de Procedimientos',
-        description: 'Completa todas las preguntas para finalizar la evaluación.',
-        dueDate: '2025-04-20',
-        questions: [
-          {
-            id: 'q1',
-            question: '¿Cuál es el procedimiento correcto al encontrar un riesgo de seguridad?',
-            options: [
-              'Ignorarlo si no es grave',
-              'Reportarlo inmediatamente al supervisor',
-              'Solucionarlo por cuenta propia',
-              'Notificar al compañero más cercano'
-            ],
-            correctOption: 1
-          },
-          {
-            id: 'q2',
-            question: '¿Qué equipo de protección es obligatorio en todas las áreas?',
-            options: [
-              'Casco de seguridad',
-              'Guantes de protección',
-              'Protección ocular',
-              'Todos los anteriores'
-            ],
-            correctOption: 3
-          },
-          {
-            id: 'q3',
-            question: '¿Cuál es la frecuencia recomendada para las capacitaciones de seguridad?',
-            options: [
-              'Una vez al año',
-              'Cada seis meses',
-              'Cada tres meses',
-              'Mensualmente'
-            ],
-            correctOption: 2
-          }
-        ]
-      };
-      setEvaluation(mockEvaluation);
-      setLoading(false);
-    }, 1000);
-  }, [params.id]);
 
   const handleAnswerSelect = (questionId: string, optionIndex: number) => {
     setAnswers(prev => ({
@@ -112,26 +121,15 @@ export default function EvaluationPage({ params }: { params: { id: string } }) {
   const handleSubmit = () => {
     setSubmitting(true);
     
-    // Aquí guardaríamos los resultados en Firebase
-    // Por ahora, simulamos el envío
+    // Simulación de envío
     setTimeout(() => {
       const score = calculateScore();
       router.push(`/evaluations/result/${params.id}?score=${score}`);
-    }, 1500);
+    }, 800);
   };
 
   // Verificar si todas las preguntas están respondidas
   const allQuestionsAnswered = evaluation?.questions.every(q => answers[q.id] !== undefined);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-xl">Cargando evaluación...</p>
-        </div>
-      </div>
-    );
-  }
 
   if (!evaluation) {
     return (
