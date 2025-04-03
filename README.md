@@ -36,7 +36,17 @@ npm install
 npm run dev
 ```
 
-4. Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
+4. Abre [http://localhost:3001](http://localhost:3001) en tu navegador.
+
+## Construcción para Producción
+
+Para crear una versión estática de la aplicación:
+
+```bash
+npm run build
+```
+
+Los archivos estáticos se generarán en la carpeta `out`.
 
 ## Despliegue en Netlify
 
@@ -46,9 +56,23 @@ La aplicación está configurada para desplegarse fácilmente en Netlify:
 2. Conecta tu repositorio de GitHub
 3. Configura los siguientes ajustes:
    - Build command: `npm run build`
-   - Publish directory: `.next`
+   - Publish directory: `out`
 
-Netlify detectará automáticamente que es una aplicación Next.js y utilizará el plugin correspondiente.
+Netlify detectará automáticamente que es una aplicación Next.js estática y utilizará la configuración adecuada.
+
+## Problemas Comunes
+
+Si tienes problemas con PowerShell y las políticas de ejecución, puedes:
+
+1. Ejecutar PowerShell como administrador y usar:
+   ```
+   Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+   ```
+
+2. O usar cmd.exe en lugar de PowerShell:
+   ```
+   cmd /c npm run dev
+   ```
 
 ## Estructura del Proyecto
 
@@ -65,7 +89,7 @@ app-capacitaciones/
 │   │   └── page.tsx   # Página de inicio
 ├── .gitignore
 ├── netlify.toml       # Configuración para Netlify
-├── next.config.js
+├── next.config.js     # Configuración de Next.js
 ├── package.json
 ├── postcss.config.js
 ├── tailwind.config.js
